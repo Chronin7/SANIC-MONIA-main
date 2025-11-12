@@ -2,6 +2,10 @@ import pygame
 import os
 import glob
 import controller
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GRAY = (200, 200, 200)
+DARK_GRAY = (100, 100, 100)
 # --- Music ---
 try:
     PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
@@ -180,6 +184,19 @@ def build_tiles(tile_map, small_size):
             else:
                 tiles.append(Tile(cell, x, y))
     return tiles
+
+# --- menu function ---
+def menu():
+    global running
+    running=True
+    pygame.mouse.set_visible()
+    return_button=pygame.rect(10,10,20,20)
+    while True:
+        for event in pygame.event.get():
+            pygame.event.pump()
+            xpos,ypos=pygame.mouse.get_cursor()
+            if is_togeter(xpos,ypos,return_button):
+                return
 
 # --- Initial sizes and assets ---
 small_size, large_size = get_tile_sizes(windowed_size)
@@ -869,7 +886,8 @@ gravity = .9
 jump_speed = -16
 on_ground = False
 sensitivity=.3
-
+def is_togeter(x,y,obj2):
+    return obj2[0][0]>x>obj2[1][0] and obj2[0][1]>y>obj2[1][1]
 def resolve_player_collisions(dx, dy):
     """Move player by dx,dy and resolve collisions with ground_tiles using masks.
     This performs AABB checks first for speed, then mask.overlap to confirm pixel collision.
@@ -1167,7 +1185,10 @@ while running:
                 background_tiles = build_tiles(background_map, small_size)
                 ground_tiles = build_tiles(ground_map, small_size)
     # ---- external controller handaling ----
-    axiss,butons=controller.get_status()
+    try:
+        axiss,butons=controller.get_status()
+    except:
+        print("no controller conected")
     # ---- get buton status ----
     try:
         
@@ -1219,9 +1240,16 @@ while running:
             move_x = speed*left_joystickx
     except:
         print("no controller conected")
-    if keys[pygame.K_a] or keys[pygame.K_LEFT] or buton_status['d_pad_left']:
+    if keys[pygame.K_a] or keys[pygame.K_LEFT]:
         move_x = -speed
-    if keys[pygame.K_d] or keys[pygame.K_RIGHT]or buton_status['d_pad_right']:
+    try:
+        if buton_status['d_pad_left']:
+            move_x = -speed
+        if buton_status['d_pad_right']:
+            move_x = speed
+    except:
+        print("no cotroller conected")
+    if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
         move_x = speed
     
     # camera controls
@@ -1254,10 +1282,15 @@ while running:
 
     # jump (only when on ground)
     
-    if (keys[pygame.K_w] or keys[pygame.K_SPACE] or keys[pygame.K_UP]or buton_status["d_pad_up"]) and on_ground:
+    if (keys[pygame.K_w] or keys[pygame.K_SPACE] or keys[pygame.K_UP]) and on_ground:
         vel.y = jump_speed
-    if left_joysticky<-sensitivity and on_ground:
-        vel.y = jump_speed*-left_joysticky
+    try:
+        if left_joysticky<-sensitivity and on_ground:
+            vel.y = jump_speed*-left_joysticky
+        if (buton_status["d_pad_up"] or buton_status["buttonA"]) and on_ground:
+            vel.y = jump_speed
+    except:
+        print("no controller conected")
     # apply gravity
     vel.y += gravity
 
@@ -1296,7 +1329,14 @@ while running:
 
     for tile in background_tiles:
         tile.draw(screen, camera_offset)
-
+    # menu
+    if keys[pygame.K_PERIOD]:
+        menu()
+    try:
+        if buton_status["menu_buton"]:
+            menu()
+    except:
+        print("no controlle conected")
     # Draw player (apply camera offset) only when not in editor mode
     if not editor_mode:
         screen.blit(player_image, (int(player_rect.x + camera_offset.x), int(player_rect.y + camera_offset.y)))
