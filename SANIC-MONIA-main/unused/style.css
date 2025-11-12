@@ -1,0 +1,9 @@
+@font-face {
+	font-family: 'Platformer';
+	src: url('platformer-Regular (4) (1).otf') format('opentype');
+	font-weight: normal;
+	font-style: normal;
+  }
+  body {
+	font-family: 'Platformer', sans-serif;
+  }
