@@ -1113,6 +1113,11 @@ while running:
                 selected_idx = (selected_idx + 1) % len(key_order)
             elif event.key == pygame.K_MINUS:
                 selected_idx = (selected_idx - 1) % len(key_order)
+            elif event.type==pygame.MOUSEWHEEL:
+                if event.y>0:
+                    selected_idx = (selected_idx + 1) % len(key_order)
+                else:
+                    selected_idx = (selected_idx - 1) % len(key_order)
             elif event.key == pygame.K_s:
                 # save rooms/templates to external JSON (rooms.json)
                 try:
