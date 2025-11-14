@@ -1166,7 +1166,14 @@ while running:
                 if event.key ==  pygame.K_m:
                     player_rect.x=int(input("x cord?"))
                     player_rect.y=int(input("y cord?"))
-
+            elif event.key==pygame.K_y:
+                save_x=player_rect.x
+                save_y=player_rect.y
+            elif event.key==pygame.K_l:
+                player_rect.x=save_x
+                player_rect.y=save_y
+                move_x=0
+                vel.y=0
         elif event.type == pygame.VIDEORESIZE:
             screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
             small_size, large_size = get_tile_sizes((event.w, event.h))
@@ -1386,6 +1393,9 @@ while running:
         "A/D or ←/→ - Player move  |  W / Space / ↑ - Jump",
         "G - Toggle grid  |  F - Toggle fullscreen",
         "[ / ] - Previous / Next room",
+        "M - teleport",
+        "Y - save position"
+        "L - load position"
         f"joystics: {axiss}",
         f"buttons: {butons}"
     ]
